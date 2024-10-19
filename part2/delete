@@ -1,0 +1,108 @@
+ enter 0, 0
+
+    push edi
+    push esi
+    push ebx
+    push edx
+
+    mov eax, [ebp + 8] ;*arr
+    mov edi, [ebp + 12]; low
+    mov esi, [ebp + 16]; high
+
+    mov ecx, edi
+    sub ecx, 1 ;int i = low - 1
+
+    mov ebx, edi;j =low
+    
+    loop1:
+        cmp ebx, esi
+        jge vseo
+        mov edx, dword [eax + 4 * esi]
+        cmp dword [eax + 4 * ebx], edx ;if(arr[j] < arr[high])
+        jge skip1
+            inc ecx ;i++
+
+            lea edx,  [eax + 4 * ecx]
+            push edx
+            lea edx,  [eax + 4 * ebx]
+            push edx
+            call swap
+            add esp, 8
+
+        skip1:
+        inc ebx ;j++
+        jmp loop1 ;j<high
+
+        vseo:
+        ;swap(&arr[i + 1], &arr[high]);  
+        inc ecx
+        lea edx, [eax + 4 * ecx]
+        push edx
+        lea edx, [eax + 4 * esi]
+        push edx        
+        call swap
+        add esp, 8
+
+
+    pop edx
+    pop ebx
+    pop esi
+    pop edi
+
+    mov eax, ecx
+    add eax, 1
+
+    leave
+    ret
+
+
+
+
+
+
+
+
+
+
+        ;; create the new stack frame
+    enter 0, 0
+    pusha
+
+    mov edx, [ebp + 8];arr
+    mov edi, [ebp + 12];low
+    mov esi, [ebp + 16];high
+    here:
+    cmp edi, esi
+    jge end
+
+    sub esp, 4
+    push esi
+    push edi
+    push edx
+    call partition
+    add esp, 16
+    
+    push eax
+
+    sub esp, 4
+    sub eax, 1
+    push eax
+    push edi
+    push edx
+    call quick_sort
+    add esp, 16
+
+    pop eax
+    
+    sub esp, 4
+    add eax, 1
+    push esi
+    push eax
+    push edx
+    call quick_sort
+    add esp, 16
+
+    end:
+    popa
+    leave
+    ret
